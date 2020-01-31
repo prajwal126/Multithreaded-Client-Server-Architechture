@@ -1,0 +1,267 @@
+qweqweqweqwe
+{
+                // Get mchart from the hashkey
+                // tempPlug = myHome.getQuadPlugs(nIndex);
+                // hashkey = tempPlug.Partionkey;
+                // get the chart from haskey
+                /// Update the Chart only
+                QuadPlug tempPlug = myHome.GetQuadPlugs().get(nIndex);
+                String hashkey = tempPlug.PartitionKey;
+                // Iterator myVeryOwnIterator = map.keySet().iterator();
+                // while(myVeryOwnIterator.hasNext()) {
+                //     String key=(String)myVeryOwnIterator.next();
+                mChart=(LineChart) chartmap.get(hashkey);
+                // }
+
+                spinner=(ProgressBar) spinnermap.get(hashkey);
+                Log.i("Chart", String.valueOf(mChart));
+                mChart.setDrawGridBackground(false);
+
+                // no description text
+                mChart.getDescription().setEnabled(false);
+
+                // enable touch gestures
+                mChart.setTouchEnabled(true);
+
+
+                // enable scaling and dragging
+                mChart.setDragEnabled(true);
+                mChart.setScaleEnabled(true);
+                // mChart.setScaleXEnabled(true);
+                // mChart.setScaleYEnabled(true);
+
+                // if disabled, scaling can be done on x- and y-axis separately
+                mChart.setPinchZoom(true);
+
+                // set an alternative background color
+                // mChart.setBackgroundColor(Color.GRAY);
+
+                // create a custom MarkerView (extend MarkerView) and specify the layout
+                // to use for it
+                //MyMarkerView mv = new MyMarkerView(this, R.layout.custom_marker_view);
+                //mv.setChartView(mChart); // For bounds control
+                //mChart.setMarker(mv); // Set the marker to the chart
+
+                // x-axis limit line
+                LimitLine llXAxis = new LimitLine(10f, "Index 10");
+                llXAxis.setLineWidth(4f);
+                llXAxis.enableDashedLine(10f, 10f, 0f);
+                llXAxis.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+                llXAxis.setTextSize(0f);
+
+                XAxis xAxis = mChart.getXAxis();
+                xAxis.disableAxisLineDashedLine();
+                xAxis.disableGridDashedLine();
+                xAxis.setDrawAxisLine(false);
+                xAxis.setDrawAxisLine(false);
+                xAxis.setDrawGridLines(false);
+                //xAxis.enableGridDashedLine(10f, 10f, 0f);
+                //xAxis.setValueFormatter(new MyCustomXAxisValueFormatter());
+                //xAxis.addLimitLine(llXAxis); // add x-axis limit line
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        int a = (int) value + 17;
+                        return "";
+                    }
+                });
+
+
+                //Typeface tf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
+
+                LimitLine ll1 = new LimitLine(150f, "Upper Limit");
+                ll1.setLineWidth(4f);
+                ll1.enableDashedLine(10f, 10f, 0f);
+                ll1.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+                ll1.setTextSize(0f);
+                //ll1.setTypeface(tf);
+
+                LimitLine ll2 = new LimitLine(-5f, "Lower Limit");
+                ll2.setLineWidth(4f);
+                ll2.enableDashedLine(10f, 10f, 0f);
+                ll2.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+                ll2.setTextSize(0f);
+                //ll2.setTypeface(tf);
+
+                YAxis leftAxis = mChart.getAxisLeft();
+                leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines
+                //leftAxis.addLimitLine(ll1);
+                //leftAxis.addLimitLine(ll2);
+                leftAxis.setAxisMaximum(200f);
+                leftAxis.setAxisMinimum(-50f);
+                leftAxis.setDrawLabels(false);
+                //leftAxis.setYOffset(20f);
+                //leftAxis.enableGridDashedLine(10f, 10f, 0f);
+                leftAxis.setDrawZeroLine(false);
+                leftAxis.disableGridDashedLine();
+                leftAxis.disableAxisLineDashedLine();
+                leftAxis.setDrawGridLines(false);
+                leftAxis.setDrawAxisLine(false);
+
+
+                // limit lines are drawn behind data (and not on top)
+                leftAxis.setDrawLimitLinesBehindData(false);
+
+                mChart.getAxisRight().setEnabled(false);
+
+                //mChart.getViewPortHandler().setMaximumScaleY(2f);
+                //mChart.getViewPortHandler().setMaximumScaleX(2f);
+
+                // add data
+                //setData(7, 100);
+                ArrayList<Entry> values = new ArrayList<Entry>();
+                //Get the current date...
+                //Add zero values from today,-1,-2,-3, -4
+
+                Date dtCurrnet = new Date();
+                Date dt5MinusCurrnet = addDay(dtCurrnet, -4);
+                String date = new SimpleDateFormat("dd", Locale.getDefault()).format(dtCurrnet);
+                System.out.println("Current time => " + date);
+                Date dtTemp = dt5MinusCurrnet;
+                Calendar calFrom = Calendar.getInstance();
+                calFrom.setTime(dtTemp);
+                Calendar calTo = Calendar.getInstance();
+                calTo.setTime(dtCurrnet);
+
+
+                //while(   (calFrom.get(Calendar.DAY_OF_MONTH) <= calTo.get(Calendar.DAY_OF_MONTH)) && (calFrom.get(Calendar.MONTH)) <= calTo.get(Calendar.MONTH) ){
+                while (calFrom.getTimeInMillis() <= calTo.getTimeInMillis()) {
+                    //values.add(new Entry(calFrom.get(Calendar.DAY_OF_YEAR),0));
+                    Date dtTemp1 = dtTemp;
+                    try {
+                        Format formatter = new SimpleDateFormat("yyyy-MM-dd");
+                        String szDate = "";
+                        //dtTemp = .parse(dtTemp.toString());
+                        szDate = formatter.format(dtTemp);
+                        dtTemp1 = ((SimpleDateFormat) formatter).parse(szDate);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    values.add(new Entry(dtTemp1.getTime(), 0));
+                    dtTemp = addDay(dtTemp, 1);
+                    calFrom.setTime(dtTemp);
+                }
+
+                int i = 10;
+                try {
+                    class EnergyReading_v1 {
+                        public Date ReadingDate;
+                        public double ReadingMax;
+                        public double ReadingMin;
+                    }
+
+                    //Gson gson = new Gson();
+                    //QuadPlug tempPlug = myHome.GetQuadPlugs().get(nIndex);
+                    //ArrayList<LinkedTreeMap<String,String>>   readings = gson.fromJson(tempPlug.LK_status,ArrayList.class);
+                    Object[] readings = gson.fromJson(tempPlug.LK_status, Object[].class);
+                    LinkedTreeMap<String, String> tempItem;
+                    ArrayList<EnergyReading_v1> readings_v1 = new ArrayList<EnergyReading_v1>();
+
+                    for (int nReadingIndex = 0; nReadingIndex < readings.length; nReadingIndex++) {
+                        //Log.d(TAG,"Follwoing entries " + readings[nReadingIndex].toString() );
+                        //Log.d(TAG,"Follwoing entries " + readings[nReadingIndex].getClass().getField("ReadingDate")+" "+ readings[nReadingIndex].getClass().getField("ReadingMax")+" "+ readings[nReadingIndex].getClass().getField("ReadingMin"));
+                        Date tempDate;
+                        float tempReadingValue = 0;
+
+                        tempItem = (LinkedTreeMap<String, String>) readings[nReadingIndex];
+                        EnergyReading_v1 oneEntry = new EnergyReading_v1();
+
+                        for (Map.Entry<String, String> entry : tempItem.entrySet()) {
+                            String key = entry.getKey();
+                            Object value = entry.getValue();
+                            if (key.equals("ReadingMax")) {
+                                tempReadingValue = ((Double) value).floatValue();
+                                oneEntry.ReadingMax = tempReadingValue;
+                            }
+                            if (key.equals("ReadingDate")) {
+                                //oneEntry.ReadingDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS").parse(value.toString());
+                                oneEntry.ReadingDate = new SimpleDateFormat("yyyy-MM-dd").parse(value.toString());
+                            }
+                        }
+                        readings_v1.add(oneEntry);
+                        /*
+                        for(Map.Entry<String,String > entry : tempItem.entrySet()) {
+                            String key = entry.getKey();
+                            Object value = entry.getValue();
+                            System.out.println(key + " => " + value.toString());
+                            if(key.equals("ReadingMax")){
+                                tempReadingValue = ((Double)value).floatValue();
+                                if (tempReadingValue < 1.0){
+                                    tempReadingValue = 0.0f;
+                                }
+                            }
+                            if(key.equals("ReadingDate")){
+                                //tempDate = new Date(value.toString());
+                                tempDate=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS").parse(value.toString());
+                                if((tempDate.before(dtCurrnet) == true) && (tempDate.after(dt5MinusCurrnet)==true)){
+                                    Log.d(TAG, "We have right value to fill.");
+                                    for(int nValIndex = 0; nValIndex< values.size();nValIndex++){
+                                        float nTempX = ((Entry)values.get(nValIndex)).getX();
+                                        if(  (int)nTempX == tempDate.getDate()){
+                                            ((Entry)values.get(nValIndex)).setY(tempReadingValue);
+                                        }
+                                    }
+                                }
+                            }
+                        }*/
+                        //values.add(new Entry(nReadingIndex+1, tempReadingValue));
+                    }
+                    for (int nReadingIndex = 0; nReadingIndex < readings_v1.size(); nReadingIndex++) {
+                        EnergyReading_v1 oneEntry = readings_v1.get(nReadingIndex);
+                        Calendar cal = Calendar.getInstance();
+                        //float dayofthemonth =  cal.get(Calendar.DAY_OF_YEAR);
+                        float dayofthemonth = oneEntry.ReadingDate.getTime();
+
+                        for (int nValIndex = 0; nValIndex < values.size(); nValIndex++) {
+                            float nTempX = ((Entry) values.get(nValIndex)).getX();
+                            if ((long) nTempX == (long) dayofthemonth) {
+                                ((Entry) values.get(nValIndex)).setY((float) oneEntry.ReadingMax);
+                            }
+                        }
+
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                if (values.size() == 0) {
+                    values.add(new Entry(1, 0));
+                }
+                LineDataSet set1 = new LineDataSet(values, "DataSet 1");
+                ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+                dataSets.add(set1); // add the datasets
+
+                // create a data object with the datasets
+                LineData data = new LineData(dataSets);
+
+                // set data
+                mChart.setData(data);
+                mChart.getLegend().setEnabled(false);
+                //QuadPlug tempPlug = myHome.GetQuadPlugs().get(nIndex);
+                //Gson gson = new Gson();
+                String json = gson.toJson(values);
+                prefsEditor.putString(hashkey, json);
+                prefsEditor.commit();
+                String Status= tempPlug.LK_status;
+                // prefsEditor.putString(hashkey, String.valueOf(data1));
+                // prefsEditor.apply();
+                Log.i("Datasets","We are setting preference in "+hashkey+" : "+ json);
+
+//        mChart.setVisibleXRange(20);
+//        mChart.setVisibleYRange(20f, AxisDependency.LEFT);
+//        mChart.centerViewTo(20, 50, AxisDependency.LEFT);
+
+                //mChart.animateX(2500);
+                mChart.invalidate();
+
+                // get the legend (only possible after setting data)
+                Legend l = mChart.getLegend();
+
+                // modify the legend ...
+                l.setForm(Legend.LegendForm.LINE);
+                spinner.setVisibility(View.GONE);
+            }
